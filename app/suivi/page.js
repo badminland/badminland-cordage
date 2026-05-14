@@ -30,26 +30,31 @@ export default function SuiviDemandes() {
       `)
       .order("created_at", { ascending: false });
 
-    if (!error) {
-      setRequests(data);
+    if (error) {
+      alert("Erreur chargement : " + error.message);
+      return;
     }
-    async function updateStatus(id, newStatus) {
-  const { error } = await supabase
-    .from("stringing_requests")
-    .update({
-      status: newStatus,
-    })
-    .eq("id", id);
 
-  if (!error) {
-    fetchRequests();
+    setRequests(data);
   }
-}
+
+  async function updateStatus(id, newStatus) {
+    const { error } = await supabase
+      .from("stringing_requests")
+      .update({ status: newStatus })
+      .eq("id", id);
+
+    if (error) {
+      alert("Erreur changement statut : " + error.message);
+      return;
+    }
+
+    fetchRequests();
   }
 
   const statusColors = {
     "Demande créée": "#999",
-    "Raquette en attente de dépôt": "#FF9800",
+    "Raquette en attente de dépôt": "#F4A62A",
     "Raquette reçue": "#2196F3",
     "Raquette en cours de cordage": "#9C27B0",
     "Raquette cordée": "#4CAF50",
@@ -57,25 +62,13 @@ export default function SuiviDemandes() {
   };
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        background: "#EFF2FF",
-        padding: "30px",
-        fontFamily: "Arial",
-      }}
-    >
+    <main style={{ minHeight: "100vh", background: "#EFF2FF", padding: "30px", fontFamily: "Arial" }}>
       <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
         <h1 style={{ color: "#0E1B4D", marginBottom: "30px" }}>
           Suivi des demandes de cordage
         </h1>
 
-        <div
-          style={{
-            display: "grid",
-            gap: "20px",
-          }}
-        >
+        <div style={{ display: "grid", gap: "20px" }}>
           {requests.map((request) => (
             <div
               key={request.id}
@@ -86,15 +79,7 @@ export default function SuiviDemandes() {
                 boxShadow: "0 6px 18px rgba(0,0,0,0.05)",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                  gap: "12px",
-                }}
-              >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
                 <div>
                   <h2 style={{ margin: 0, color: "#0E1B4D" }}>
                     {request.rackets?.brand} {request.rackets?.model}
@@ -113,37 +98,38 @@ export default function SuiviDemandes() {
                   </p>
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-  <div
-    style={{
-      background: statusColors[request.status] || "#999",
-      color: "white",
-      padding: "12px 18px",
-      borderRadius: "999px",
-      fontWeight: "bold",
-      textAlign: "center",
-    }}
-  >
-    {request.status}
-  </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", minWidth: "260px" }}>
+                  <div
+                    style={{
+                      background: statusColors[request.status] || "#999",
+                      color: "white",
+                      padding: "12px 18px",
+                      borderRadius: "999px",
+                      fontWeight: "bold",
+                      textAlign: "center",
+                    }}
+                  >
+                    {request.status}
+                  </div>
 
-  <select
-    value={request.status}
-    onChange={(e) => updateStatus(request.id, e.target.value)}
-    style={{
-      padding: "10px",
-      borderRadius: "10px",
-      border: "1px solid #ddd",
-    }}
-  >
-    <option>Demande créée</option>
-    <option>Raquette en attente de dépôt</option>
-    <option>Raquette reçue</option>
-    <option>Raquette en cours de cordage</option>
-    <option>Raquette cordée</option>
-    <option>Raquette livrée</option>
-  </select>
-</div>
+                  <select
+                    value={request.status}
+                    onChange={(e) => updateStatus(request.id, e.target.value)}
+                    style={{
+                      padding: "12px",
+                      borderRadius: "12px",
+                      border: "2px solid #0E1B4D",
+                      fontSize: "16px",
+                    }}
+                  >
+                    <option>Demande créée</option>
+                    <option>Raquette en attente de dépôt</option>
+                    <option>Raquette reçue</option>
+                    <option>Raquette en cours de cordage</option>
+                    <option>Raquette cordée</option>
+                    <option>Raquette livrée</option>
+                  </select>
+                </div>
               </div>
             </div>
           ))}
