@@ -33,6 +33,18 @@ export default function SuiviDemandes() {
     if (!error) {
       setRequests(data);
     }
+    async function updateStatus(id, newStatus) {
+  const { error } = await supabase
+    .from("stringing_requests")
+    .update({
+      status: newStatus,
+    })
+    .eq("id", id);
+
+  if (!error) {
+    fetchRequests();
+  }
+}
   }
 
   const statusColors = {
@@ -101,17 +113,37 @@ export default function SuiviDemandes() {
                   </p>
                 </div>
 
-                <div
-                  style={{
-                    background: statusColors[request.status] || "#999",
-                    color: "white",
-                    padding: "12px 18px",
-                    borderRadius: "999px",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {request.status}
-                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+  <div
+    style={{
+      background: statusColors[request.status] || "#999",
+      color: "white",
+      padding: "12px 18px",
+      borderRadius: "999px",
+      fontWeight: "bold",
+      textAlign: "center",
+    }}
+  >
+    {request.status}
+  </div>
+
+  <select
+    value={request.status}
+    onChange={(e) => updateStatus(request.id, e.target.value)}
+    style={{
+      padding: "10px",
+      borderRadius: "10px",
+      border: "1px solid #ddd",
+    }}
+  >
+    <option>Demande créée</option>
+    <option>Raquette en attente de dépôt</option>
+    <option>Raquette reçue</option>
+    <option>Raquette en cours de cordage</option>
+    <option>Raquette cordée</option>
+    <option>Raquette livrée</option>
+  </select>
+</div>
               </div>
             </div>
           ))}
